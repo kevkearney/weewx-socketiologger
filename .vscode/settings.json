@@ -1,0 +1,33 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+     "deploy": {
+          "packages": [
+            {
+                "name": "Knimbus Socket Logger",
+                "description": "Knimbus Socket Logger",  
+                "files": [
+                    "**"                
+                ],
+                "exclude": [
+                    "tests/**"
+                ],             
+                "deployOnSave": true
+            }
+        ],
+        "targets": [
+            {
+                "type": "sftp",
+                "name": "Aquarii SFTP folder",
+                "description": "A SFTP folder",
+
+                "dir": "/home/pi/Source/KnimbusSocketLogger",
+                "host": "192.168.0.145", "port": 22,
+                "user": "pi", "password": "ovenfreezer",
+                "checkBeforeDeploy": true,
+                //"hashes": ["85128a5a6121f139c3123a4919e3cc26"],                
+                "hashAlgorithm": "md5"
+            }
+        ]
+    },
+    "python.linting.pylintEnabled": false
+}
