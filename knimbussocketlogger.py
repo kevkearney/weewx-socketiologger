@@ -111,14 +111,13 @@ class KnimbusSocketLogger(weewx.drivers.AbstractDevice):
             if self.packet is not None:
                 loginf('Retrieved packet')
                 logdebug(self.packet)
-                if self.packet["Humidity"] == 0 and self.packet["Temperature"] == 0
+                if self.packet["outHumidity"] == 0 and self.packet["outTemp"] == 0 or self.packet["rain"] > 20:
                     loginf('Bad Packet Data')
                 else:
                     yield self.packet
                 self.packet = None
                 
     def genPacket(self, *args):
-        #logdebug('weather message: %s' % (args)) 
         logdebug('genPacket fired')  
         self.packet = self._process_message(args[0])
                
@@ -130,14 +129,14 @@ class KnimbusSocketLogger(weewx.drivers.AbstractDevice):
               
         _packet['dateTime'] = int(time.time())
         _packet['usUnits'] = weewx.METRIC
-        _packet['outTemp'] = float( weatherData["Temperature"]/100)
-        _packet['outHumidity'] = float( weatherData["Humidity"] /100 )   
-        _packet['inTemp'] = float( weatherData["BaroTemperature"] /100 )
-        _packet['inHumidity'] = float( weatherData["BaroHumidity"] /100)
-        _packet['pressure'] = float( weatherData["BaroPressure"]/10 )
-        _packet['rain'] = (weatherData["RainClicks"]/100 )
+        _packet['outTemp'] = float(weatherData["Temperature"])/100
+        _packet['outHumidity'] = float( weatherData["Humidity"]) /100    
+        _packet['extraTemp1'] = float( weatherData["BaroTemperature"]) /100 
+        _packet['extraHumid1'] = float( weatherData["BaroHumidity"]) /100
+        _packet['pressure'] = float( weatherData["BaroPressure"])/10 
+        _packet['rain'] = float(weatherData["RainClicks"])*.01 
         _packet['windDir'] = float( weatherData["WindDirection"] )
-        _packet['windSpeed'] = float( (weatherData["WindSpeed"]/100) * 1.609344)
+        _packet['windSpeed'] = ((float(weatherData["WindSpeed"])/100) * 1.609344)
         #_packet['windGust'] = float( weatherData["windGust"] )
         #_packet['windGustDir'] = float( weatherData["windDir"] )
         #_packet['radiation'] = float( weatherData["radiation"] )
