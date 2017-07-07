@@ -84,6 +84,7 @@ class KnimbusSocketLogger(weewx.drivers.AbstractDevice):
         self.station_hardware = stn_dict.get('hardware')       
        
         self.packet = None
+        self.lastDateStamp = None
 
         self.socket = None
         self.openPort()
@@ -111,10 +112,13 @@ class KnimbusSocketLogger(weewx.drivers.AbstractDevice):
             if self.packet is not None:
                 loginf('Retrieved packet')
                 logdebug(self.packet)
-                if self.packet["outHumidity"] == 0 and self.packet["outTemp"] == 0 or self.packet["rain"] > 20:
+                if self.packet["outHumidity"] == 0 and self.packet["outTemp"] == 0 or self.packet["rain"] > 1:
                     loginf('Bad Packet Data')
+                elif self.packet["dateTime"] == self.lastDateStamp:
+                    loginf('Duplicate Packet')    
                 else:
                     yield self.packet
+                    self.lastDateStamp = self.packet["dateTime"]
                 self.packet = None
                 
     def genPacket(self, *args):
@@ -134,7 +138,7 @@ class KnimbusSocketLogger(weewx.drivers.AbstractDevice):
         _packet['extraTemp1'] = float( weatherData["BaroTemperature"]) /100 
         _packet['extraHumid1'] = float( weatherData["BaroHumidity"]) /100
         _packet['pressure'] = float( weatherData["BaroPressure"])/10 
-        _packet['rain'] = float(weatherData["RainClicks"])*.01 
+        _packet['rain'] = (float(weatherData["RainClicks"])*.01) * 2.54 
         _packet['windDir'] = float( weatherData["WindDirection"] )
         _packet['windSpeed'] = ((float(weatherData["WindSpeed"])/100) * 1.609344)
         #_packet['windGust'] = float( weatherData["windGust"] )
